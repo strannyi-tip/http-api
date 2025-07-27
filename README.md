@@ -9,7 +9,7 @@ const api = new Api("https://www.google.com");
 //The Api using fluent interface
 api
     //For example set cacheable
-    .setCache('reload')
+    .setCache(Api.Cache.RELOAD)
 
     //Say that you want to send GET request using empty data
     .get('')
