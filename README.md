@@ -12,7 +12,7 @@ api
     .setCache(Api.Cache.RELOAD)
 
     //Say that you want to send GET request using empty data
-    .get('')
+    .get()
 
     //Use response what u need
     .then(result => console.log(result));
