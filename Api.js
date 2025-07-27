@@ -4,7 +4,7 @@
 export default class Api {
 
     /**
-     * HTTP method.
+     * HTTP method enumeration.
      *
      * @type {{GET: string, HEAD: string, POST: string, PUT: string, DELETE: string, CONNECT: string, OPTIONS: string, TRACE: string, PATCH: string}}
      */
@@ -18,6 +18,62 @@ export default class Api {
         OPTIONS: 'OPTIONS',
         TRACE: 'TRACE',
         PATCH: 'PATCH',
+    };
+
+    /**
+     * HTTP mode enumeration.
+     *
+     * @type {{NOCORS: string, CORS: string, ORIGIN: string}}
+     */
+    static Mode = {
+        NO_CORS: 'no-cors',
+        CORS: 'cors',
+        ORIGIN: 'same-origin',
+    };
+
+    /**
+     * HTTP cache enumiration.
+     *
+     * @type {{DEFAULT: string, NO_CACHE: string, RELOAD: string, FORCE: string, ONLY_IF_CACHED: string}}
+     */
+    static Cache = {
+        DEFAULT: 'default',
+        NO_CACHE: 'no-cache',
+        RELOAD: 'reload',
+        FORCE_CACHE: 'force-cache',
+        ONLY_IF_CACHED: 'only-if-cached',
+    };
+
+    /**
+     * HTTP credentials enumaration.
+     *
+     * @type {{INCLUDE: string, SAME_ORIGIN: string, OMIT: string}}
+     */
+    static Credentials = {
+        INCLUDE: 'include',
+        SAME_ORIGIN: 'same-origin',
+        OMIT: 'omit',
+    };
+
+    /**
+     * HTTP redirect enumiration.
+     *
+     * @type {{MANUAL: string, FOLLOW: string, ERROR: string}}
+     */
+    static Redirect = {
+        MANUAL: 'manual',
+        FOLLOW: 'follow',
+        ERROR: 'error',
+    };
+
+    /**
+     * HTTP referrer policy enumiration.
+     *
+     * @type {{NO_REFERRER: string, CLIENT: string}}
+     */
+    static ReferrerPolicy = {
+        NO_REFERRER: 'no-referrer',
+        CLIENT: 'client',
     };
 
     /**
@@ -39,7 +95,7 @@ export default class Api {
          *
          * @private
          */
-        this._method = 'GET';
+        this._method = Api.Method.GET;
 
         /**
          * The HTTP request body.
@@ -51,31 +107,31 @@ export default class Api {
         this._body = '';
 
         /**
-         * The HTTP request mode (no-cors, *cors, same-origin).
+         * The HTTP request mode.
          *
          * @type {string}
          *
          * @private
          */
-        this._mode = 'cors';
+        this._mode = Api.Mode.CORS;
 
         /**
-         * The HTTP request cache (*default, no-cache, reload, force-cache, only-if-cached).
+         * The HTTP request cache.
          *
          * @type {string}
          *
          * @private
          */
-        this._cache = 'no-cache';
+        this._cache = Api.Cache.NO_CACHE;
 
         /**
-         * The HTTP request credentials (include, *same-origin, omit).
+         * The HTTP request credentials.
          *
          * @type {string}
          *
          * @private
          */
-        this._credentials = 'omit';
+        this._credentials = Api.Credentials.OMIT;
 
         /**
          * The HTTP request headers.
@@ -87,22 +143,22 @@ export default class Api {
         this._headers = new Headers();
 
         /**
-         * The HTTP request redirect (manual, *follow, error).
+         * The HTTP request redirect.
          *
          * @type {string}
          *
          * @private
          */
-        this._redirect = 'follow';
+        this._redirect = Api.Redirect.FOLLOW;
 
         /**
-         * The HTTP request referrer policy (no-referrer, *client).
+         * The HTTP request referrer.
          *
          * @type {string}
          *
          * @private
          */
-        this._referrerPolicy = 'no-referrer';
+        this._referrerPolicy = Api.ReferrerPolicy.NO_REFERRER;
     }
 
     /**
