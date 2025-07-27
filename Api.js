@@ -365,7 +365,7 @@ export default class Api {
      *
      * @returns {Promise<void>}
      */
-    async get(data) {
+    async get(data = '') {
         await this._send(Api.Method.GET, data);
     }
 
