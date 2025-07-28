@@ -1,6 +1,6 @@
 {
   "name": "strange-http",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Small javascript http api",
   "main": "Api.js",
   "scripts": {
