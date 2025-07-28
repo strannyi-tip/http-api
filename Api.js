@@ -89,24 +89,6 @@ export default class Api {
         this._url = url;
 
         /**
-         * The HTTP request method.
-         *
-         * @type {string}
-         *
-         * @private
-         */
-        this._method = Api.Method.GET;
-
-        /**
-         * The HTTP request body.
-         *
-         * @type {string}
-         *
-         * @private
-         */
-        this._body = '';
-
-        /**
          * The HTTP request mode.
          *
          * @type {string}
@@ -264,24 +246,6 @@ export default class Api {
     }
 
     /**
-     * The _method getter.
-     *
-     * @returns {string}
-     */
-    get method() {
-        return this._method;
-    }
-
-    /**
-     * The _body getter.
-     *
-     * @returns {string}
-     */
-    get body() {
-        return this._body;
-    }
-
-    /**
      * The _mode getter.
      *
      * @returns {string}
@@ -347,14 +311,14 @@ export default class Api {
      */
     async _send(method, data) {
         await fetch(this._url, {
-            method: this._method,
+            method: method,
             mode: this._mode,
             cache: this._cache,
             credentials: this._credentials,
             headers: this._headers,
             redirect: this._redirect,
             referrerPolicy: this._referrerPolicy,
-            body: this._body,
+            body: data,
         });
     }
 
