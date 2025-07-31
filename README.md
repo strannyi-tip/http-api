@@ -48,7 +48,7 @@ api
   //Append header
   .addHeader('Content-Type', 'application/json')
   .post({some: data})
-  .then(response => console.log(response);
+  .then(response => console.log(response));
 ```
 
 
