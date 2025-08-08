@@ -1,5 +1,7 @@
 # Javascript HTTP api
 
+[![tests](https://github.com/strannyi-tip/http-api/actions/workflows/npm-test.yml/badge.svg)](https://github.com/strannyi-tip/http-api/actions/workflows/npm-test.yml)
+
 ### Simple example
 
 ```javascript
