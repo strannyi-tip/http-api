@@ -1,7 +1,7 @@
 /**
  * HTTP api.
  */
-export default class Api {
+class Api {
 
     /**
      * HTTP method enumeration.
@@ -78,8 +78,16 @@ export default class Api {
 
     /**
      * @param url The request URL
+     * @param sender
      */
-    constructor(url) {
+    constructor(url, sender = fetch) {
+
+        /**
+         * HTTP request sender.
+         *
+         * @private
+         */
+        this._sender = sender;
 
         /**
          * The request url.
@@ -310,7 +318,7 @@ export default class Api {
      * @private
      */
     async _send(method, data) {
-        await fetch(this._url, {
+        await this._sender(this._url, {
             method: method,
             mode: this._mode,
             cache: this._cache,
@@ -421,3 +429,5 @@ export default class Api {
         await this._send(Api.Method.PATCH, data);
     }
 }
+
+module.exports = Api;
