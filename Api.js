@@ -32,7 +32,7 @@ class Api {
     };
 
     /**
-     * HTTP cache enumiration.
+     * HTTP cache enumeration.
      *
      * @type {{DEFAULT: string, NO_CACHE: string, RELOAD: string, FORCE: string, ONLY_IF_CACHED: string}}
      */
@@ -149,6 +149,22 @@ class Api {
          * @private
          */
         this._referrerPolicy = Api.ReferrerPolicy.NO_REFERRER;
+
+        /**
+         * The watch interval descriptors.
+         *
+         * @type {{}}
+         * @private
+         */
+        this._watch_descriptors = {};
+
+        /**
+         * Thw watch objects differences.
+         *
+         * @type {{}}
+         * @private
+         */
+        this._watch_diffs = {};
     }
 
     /**
@@ -317,28 +333,28 @@ class Api {
      *
      * @private
      */
-    async _send(method, data) {
-        await this._sender(this._url, {
-            method: method,
-            mode: this._mode,
-            cache: this._cache,
-            credentials: this._credentials,
-            headers: this._headers,
-            redirect: this._redirect,
-            referrerPolicy: this._referrerPolicy,
-            body: data,
+   async _send(method, data = null) {
+        return new Promise((resolve, reject) => {
+            resolve(this._sender(this._url, {
+                method: method,
+                mode: this._mode,
+                cache: this._cache,
+                credentials: this._credentials,
+                headers: this._headers,
+                redirect: this._redirect,
+                referrerPolicy: this._referrerPolicy,
+                body: JSON.stringify(data),
+            }));
         });
     }
 
     /**
      * The HTTP[GET] request.
      *
-     * @param data
-     *
-     * @returns {Promise<void>}
+     * @return {Promise<void>}
      */
-    async get(data = '') {
-        await this._send(Api.Method.GET, data);
+    async get() {
+        return await this._send(Api.Method.GET);
     }
 
     /**
@@ -346,10 +362,10 @@ class Api {
      *
      * @param data
      *
-     * @returns {Promise<void>}
+     * @return {Promise<void>}
      */
     async head(data) {
-        await this._send(Api.Method.HEAD, data);
+        return await this._send(Api.Method.HEAD, data);
     }
 
     /**
@@ -357,10 +373,10 @@ class Api {
      *
      * @param data
      *
-     * @returns {Promise<void>}
+     * @return {Promise<void>}
      */
     async post(data) {
-        await this._send(Api.Method.POST, data);
+        return await this._send(Api.Method.POST, data);
     }
 
     /**
@@ -368,10 +384,10 @@ class Api {
      *
      * @param data
      *
-     * @returns {Promise<void>}
+     * @return {Promise<void>}
      */
     async put(data) {
-        await this._send(Api.Method.PUT, data);
+        return await this._send(Api.Method.PUT, data);
     }
 
     /**
@@ -379,10 +395,10 @@ class Api {
      *
      * @param data
      *
-     * @returns {Promise<void>}
+     * @return {Promise<void>}
      */
     async delete(data) {
-        await this._send(Api.Method.DELETE, data);
+        return await this._send(Api.Method.DELETE, data);
     }
 
     /**
@@ -390,10 +406,10 @@ class Api {
      *
      * @param data
      *
-     * @returns {Promise<void>}
+     * @return {Promise<void>}
      */
     async connect(data) {
-        await this._send(Api.Method.CONNECT, data);
+        return await this._send(Api.Method.CONNECT, data);
     }
 
     /**
@@ -401,7 +417,7 @@ class Api {
      *
      * @param data
      *
-     * @returns {Promise<void>}
+     * @return {Promise<void>}
      */
     async options(data) {
         await this._send(Api.Method.OPTIONS, data);
@@ -412,10 +428,10 @@ class Api {
      *
      * @param data
      *
-     * @returns {Promise<void>}
+     * @return {Promise<void>}
      */
     async trace(data) {
-        await this._send(Api.Method.TRACE, data);
+        return await this._send(Api.Method.TRACE, data);
     }
 
     /**
@@ -423,10 +439,49 @@ class Api {
      *
      * @param data
      *
-     * @returns {Promise<void>}
+     * @return {Promise<void>}
      */
     async patch(data) {
-        await this._send(Api.Method.PATCH, data);
+        return await this._send(Api.Method.PATCH, data);
+    }
+
+    /**
+     * Watch is object has changed data.
+     *
+     * @param object Target object
+     * @param timeout Interval timeout
+     *
+     * @returns {{}}
+     */
+    async watch(object, timeout = 1000) {
+        const watch_id = Date.now();
+        this._watch_diffs[watch_id] = object;
+        this._watch_descriptors[watch_id] = setInterval(async () => {
+            return await this._send(Api.Method.GET)
+                .then(remote_object => this._compareObjects(this._watch_diffs[watch_id], remote_object, watch_id));
+        }, timeout);
+    }
+
+    /**
+     * Compare two objects and save diff.
+     *
+     * @param first Left object
+     * @param second Right object
+     * @param watch_id The watcher id
+     * @private
+     */
+    _compareObjects(first, second, watch_id) {
+        for (const key in Object.keys(first)) {
+            if (!second.hasOwnProperty(key)) {
+                clearInterval(this._watch_descriptors[watch_id]);
+                throw Error(`Wrong keys compatibility. Left object key [${key}] not present in right object.`);
+            }
+            if (first[key] !== second[key]) {
+                this._watch_diffs[watch_id][key] = second[key];
+            }
+        }
+
+        return this._watch_diffs[watch_id];
     }
 }
 

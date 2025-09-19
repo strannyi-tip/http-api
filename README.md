@@ -13,10 +13,10 @@ api
     //For example set cacheable
     .setCache(Api.Cache.RELOAD)
 
-    //Say that you want to send GET request using empty data
+    //Say that you want to send GET request
     .get()
 
-    //Use response what u need
+    //Use response what u need. @result is a Response object
     .then(result => console.log(result));
 ```
 
@@ -30,7 +30,9 @@ const fonts_api = new Api('https://foo.bar/fonts');
 icons_api.post({
     name: 'First icon',
     file: '/icons/icon1.png'
-}).then(response => console.log('New icon uploaded!'));
+})
+    .then(response => console.log('New icon uploaded!'))
+    .catch(error => throw new Error('Upload error'));
 
 fonts_api.delete({
     id: 777,
@@ -50,7 +52,7 @@ api
   //Append header
   .addHeader('Content-Type', 'application/json')
   .post({some: data})
-  .then(response => console.log(response));
+  .then(response => response.text().then(text => console.log(text)));
 ```
 
 

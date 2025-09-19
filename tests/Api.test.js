@@ -146,3 +146,7 @@ test('Test for referrerPolicy setted correctly', () => {
             expect(r.options.referrerPolicy).toBe(Api.ReferrerPolicy.NO_REFERRER);
         });
 });
+
+test('Test for watch object', async () => {
+
+});
