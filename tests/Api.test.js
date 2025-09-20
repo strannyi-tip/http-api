@@ -1,5 +1,5 @@
 const Api = require('../Api');
-const PseudoSender = require("../PseudoSender");
+const PseudoSender = require("../src/PseudoSender");
 
 const api = new Api(':http:', PseudoSender.fetch);
 
@@ -42,30 +42,6 @@ test('Test for DELETE method setted correctly', () => {
         expect(r.url).toBe(':http:');
         expect(r.options.method).toBe(Api.Method.DELETE);
         expect(r.options.body).toBe({foo: 'foo'});
-    });
-});
-
-test('Test for CONNECT method setted correctly', () => {
-    api.connect({foo: 'foo', bar: 'bar'}).then(r => (r) => {
-        expect(r.url).toBe(':http:');
-        expect(r.options.method).toBe(Api.Method.CONNECT);
-        expect(r.options.body).toBe({foo: 'foo', bar: 'bar'});
-    });
-});
-
-test('Test for OPTIONS method setted correctly', () => {
-    api.options({message: 'Work for food'}).then(r => (r) => {
-        expect(r.url).toBe(':http:');
-        expect(r.options.method).toBe(Api.Method.OPTIONS);
-        expect(r.options.body).toBe({message: 'Work for food'});
-    });
-});
-
-test('Test for TRACE method setted correctly', () => {
-    api.trace({message: 'Need more gold'}).then(r => (r) => {
-        expect(r.url).toBe(':http:');
-        expect(r.options.method).toBe(Api.Method.TRACE);
-        expect(r.options.body).toBe({message: 'Need more gold'});
     });
 });
 

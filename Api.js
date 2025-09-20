@@ -6,7 +6,7 @@ class Api {
     /**
      * HTTP method enumeration.
      *
-     * @type {{GET: string, HEAD: string, POST: string, PUT: string, DELETE: string, CONNECT: string, OPTIONS: string, TRACE: string, PATCH: string}}
+     * @type {{GET: string, HEAD: string, POST: string, PUT: string, DELETE: string, PATCH: string}}
      */
     static Method = {
         GET: 'GET',
@@ -14,9 +14,6 @@ class Api {
         POST: 'POST',
         PUT: 'PUT',
         DELETE: 'DELETE',
-        CONNECT: 'CONNECT',
-        OPTIONS: 'OPTIONS',
-        TRACE: 'TRACE',
         PATCH: 'PATCH',
     };
 
@@ -45,7 +42,7 @@ class Api {
     };
 
     /**
-     * HTTP credentials enumaration.
+     * HTTP credentials enumeration.
      *
      * @type {{INCLUDE: string, SAME_ORIGIN: string, OMIT: string}}
      */
@@ -56,7 +53,7 @@ class Api {
     };
 
     /**
-     * HTTP redirect enumiration.
+     * HTTP redirect enumeration.
      *
      * @type {{MANUAL: string, FOLLOW: string, ERROR: string}}
      */
@@ -67,7 +64,7 @@ class Api {
     };
 
     /**
-     * HTTP referrer policy enumiration.
+     * HTTP referrer policy enumeration.
      *
      * @type {{NO_REFERRER: string, CLIENT: string}}
      */
@@ -165,6 +162,25 @@ class Api {
          * @private
          */
         this._watch_diffs = {};
+
+        /**
+         * Methods which have not body.
+         *
+         * @type {string[]}
+         * @private
+         */
+        this._no_body_methods = [
+            Api.Method.GET,
+            Api.Method.HEAD,
+        ];
+
+        /**
+         * The logger.
+         *
+         * @type {null}
+         * @private
+         */
+        this._logger = null;
     }
 
     /**
@@ -261,6 +277,28 @@ class Api {
     }
 
     /**
+     * Set the Logger object.
+     *
+     * @param logger The Logger interface
+     *
+     * @return {Api}
+     */
+    setLogger(logger) {
+        this._logger = logger;
+
+        return this;
+    }
+
+    /**
+     * Has logger.
+     *
+     * @return {boolean}
+     */
+    hasLogger() {
+        return null !== this._logger;
+    }
+
+    /**
      * The _url getter.
      *
      * @returns {string}
@@ -334,17 +372,28 @@ class Api {
      * @private
      */
    async _send(method, data = null) {
+       const options = {
+           method: method,
+           mode: this._mode,
+           cache: this._cache,
+           credentials: this._credentials,
+           headers: this._headers,
+           redirect: this._redirect,
+           referrerPolicy: this._referrerPolicy,
+       };
+       if (!this._no_body_methods.includes(method)) {
+           options.body = JSON.stringify(data);
+       }
+
         return new Promise((resolve, reject) => {
-            resolve(this._sender(this._url, {
-                method: method,
-                mode: this._mode,
-                cache: this._cache,
-                credentials: this._credentials,
-                headers: this._headers,
-                redirect: this._redirect,
-                referrerPolicy: this._referrerPolicy,
-                body: JSON.stringify(data),
-            }));
+            resolve(this._sender(this._url, options));
+            reject((e) => {
+                if (!this.hasLogger()) {
+                    console.log(e);
+                } else {
+                    this._logger.error(e);
+                }
+            });
         });
     }
 
@@ -360,12 +409,10 @@ class Api {
     /**
      * The HTTP[HEAD] request.
      *
-     * @param data
-     *
      * @return {Promise<void>}
      */
-    async head(data) {
-        return await this._send(Api.Method.HEAD, data);
+    async head() {
+        return await this._send(Api.Method.HEAD);
     }
 
     /**
@@ -399,39 +446,6 @@ class Api {
      */
     async delete(data) {
         return await this._send(Api.Method.DELETE, data);
-    }
-
-    /**
-     * The HTTP[CONNECT] request.
-     *
-     * @param data
-     *
-     * @return {Promise<void>}
-     */
-    async connect(data) {
-        return await this._send(Api.Method.CONNECT, data);
-    }
-
-    /**
-     * The HTTP[OPTIONS] request.
-     *
-     * @param data
-     *
-     * @return {Promise<void>}
-     */
-    async options(data) {
-        await this._send(Api.Method.OPTIONS, data);
-    }
-
-    /**
-     * The HTTP[TRACE] request.
-     *
-     * @param data
-     *
-     * @return {Promise<void>}
-     */
-    async trace(data) {
-        return await this._send(Api.Method.TRACE, data);
     }
 
     /**
