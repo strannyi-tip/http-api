@@ -1,7 +1,9 @@
 const Api = require('../Api');
 const PseudoSender = require("../src/PseudoSender");
+const ResponseStub = require("../src/ResponseStub");
 
 const api = new Api(':http:', PseudoSender.fetch);
+const response_api = new Api(':http:', ResponseStub.fetch)
 
 test('Test for url setted correctly', ()=>{
     expect(api.url).toBe(':http:');
@@ -124,5 +126,12 @@ test('Test for referrerPolicy setted correctly', () => {
 });
 
 test('Test for watch object', async () => {
-
+    const object_has_no_changes = {
+        id: 1,
+        name: 'Slim Sad',
+    };
+    response_api
+        .watch(object_has_no_changes, (diff) => {
+            expect(object_has_no_changes).toBe(diff);
+        }, 1000, 1);
 });

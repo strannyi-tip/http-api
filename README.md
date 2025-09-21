@@ -40,7 +40,7 @@ fonts_api.delete({
 }).then(response => console.log('Font by id 777 removed successful'));
 ```
 
-### Send request by use header
+### Send a request by using a header
 
 ```javascript
 //Create the api instances by url what u need
@@ -54,6 +54,21 @@ api
   .post({some: data})
   .then(response => response.text().then(text => console.log(text)));
 ```
+
+
+### Use watching
+
+```javascript
+    //Create the api instance point to resource url
+    const api = new Api('https://foo.bar/object/1');
+    
+    api
+        .watch({id: 1, name: 'GiveMeFood'}, (diff) => console.log(diff));
+```
+
+The watch method tracks whether the remote object has changed and returns a difference only if changes have occurred.
+
+
 
 
 
