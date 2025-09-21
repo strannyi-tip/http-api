@@ -70,6 +70,26 @@ The watch method tracks whether the remote object has changed and returns a diff
 
 
 
+### Use logging
 
+```javascript
+    const api = new Api('https://foo.bar/path');
+    
+    //Use remote log storage
+    api
+        .setLogUrl('https://foo.bar/log')
+        .log('This is a log message', {
+            token: 'JNuhbhuijbhfto9j989hyRFUygoU9890opo'
+        }).then();
+    
+    //Use custom Logger
+    api
+        .setLogger(new CustomLogger())
+        .log('Down with the power of the reptilians!')
+        .then();
+    
+    //Use console
+    api.log("Help, I'm being held hostage and forced to write code.").then();
+```
 
 
