@@ -181,6 +181,14 @@ class Api {
          * @private
          */
         this._logger = null;
+
+        /**
+         * URL address for write error logs.
+         *
+         * @type {string|null}
+         * @private
+         */
+        this._log_url = null;
     }
 
     /**
@@ -290,6 +298,19 @@ class Api {
     }
 
     /**
+     * Set url for logging errors.
+     *
+     * @param url
+     *
+     * @return {Api}
+     */
+    setLogUrl(url) {
+        this._log_url = url;
+
+        return this;
+    }
+
+    /**
      * Has logger.
      *
      * @return {boolean}
@@ -388,11 +409,7 @@ class Api {
         return new Promise((resolve, reject) => {
             resolve(this._sender(this._url, options));
             reject((e) => {
-                if (!this.hasLogger()) {
-                    console.log(e);
-                } else {
-                    this._logger.error(e);
-                }
+                this._writeLog(e);
             });
         });
     }
@@ -460,6 +477,18 @@ class Api {
     }
 
     /**
+     * Send log to server.
+     *
+     * @param message Log message
+     * @param data Request data
+     *
+     * @return {Promise<void>}
+     */
+    async log(message, data = {}) {
+        await this._writeLog(message, data);
+    }
+
+    /**
      * Watch is object has changed data.
      *
      * @param object Target object
@@ -514,6 +543,63 @@ class Api {
         if (changes_count > 0) {
             callback(this._watch_diffs[watch_id]);
         }
+    }
+
+    /**
+     * Write log message.
+     *
+     * @param message The log message
+     * @param data Request data
+     *
+     * @private
+     */
+    _writeLog(message, data = {}) {
+        if (!this.hasLogger()) {
+            this._useLogUrlOrConsole(message, data);
+        } else {
+            this._logger.log(message);
+        }
+    }
+
+    /**
+     * Send message to server or show in console.
+     *
+     * @param message The log message
+     * @param data Request data
+     *
+     * @private
+     */
+    _useLogUrlOrConsole(message, data) {
+        if (null !== this._log_url) {
+            this._sendLog(message, data);
+        } else {
+            this._showLog(message);
+        }
+    }
+
+    /**
+     * Send log message to server.
+     *
+     * @param message The log message
+     * @param data Request data
+     *
+     * @private
+     */
+    _sendLog(message, data = {}) {
+        data.message = message;
+
+        this._send(Api.Method.POST, data).then(r => console.log('Log written successfully'));
+    }
+
+    /**
+     * Show log message in console.
+     *
+     * @param message The log message
+     *
+     * @private
+     */
+    _showLog(message) {
+        console.log(message);
     }
 }
 
