@@ -463,39 +463,57 @@ class Api {
      * Watch is object has changed data.
      *
      * @param object Target object
+     * @param callback Callback function called if an object has diff
      * @param timeout Interval timeout
+     * @param limit Interval loop limit
      *
      * @returns {{}}
      */
-    async watch(object, timeout = 1000) {
+    watch(object, callback, timeout = 1000, limit = 0) {
         const watch_id = Date.now();
+        let iterator = 0;
         this._watch_diffs[watch_id] = object;
         this._watch_descriptors[watch_id] = setInterval(async () => {
-            return await this._send(Api.Method.GET)
-                .then(remote_object => this._compareObjects(this._watch_diffs[watch_id], remote_object, watch_id));
+            if (limit !== 0 && limit !== iterator) {
+                iterator++;
+            } else {
+                clearInterval(this._watch_descriptors[watch_id]);
+            }
+
+            return this._send(Api.Method.GET)
+                .then(response => response.text()
+                    .then(text => this._compareObjects(this._watch_diffs[watch_id], JSON.parse(text), watch_id, callback))
+                );
         }, timeout);
     }
 
     /**
-     * Compare two objects and save diff.
+     * Compare two objects and put diff to callback.
      *
      * @param first Left object
      * @param second Right object
      * @param watch_id The watcher id
+     * @param callback Callback function called if an object has diff
      * @private
      */
-    _compareObjects(first, second, watch_id) {
-        for (const key in Object.keys(first)) {
+    _compareObjects(first, second, watch_id, callback) {
+        const keys = Object.keys(first);
+        let changes_count = 0;
+        for (const index in keys) {
+            const key = keys[index];
             if (!second.hasOwnProperty(key)) {
                 clearInterval(this._watch_descriptors[watch_id]);
                 throw Error(`Wrong keys compatibility. Left object key [${key}] not present in right object.`);
             }
             if (first[key] !== second[key]) {
                 this._watch_diffs[watch_id][key] = second[key];
+                changes_count++;
             }
         }
 
-        return this._watch_diffs[watch_id];
+        if (changes_count > 0) {
+            callback(this._watch_diffs[watch_id]);
+        }
     }
 }
 

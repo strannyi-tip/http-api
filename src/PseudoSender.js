@@ -1,12 +1,8 @@
 class PseudoSender {
-    static async fetch(url, options) {
+    static async fetch(url, options, data = {}) {
         return {
             url: url,
             options: options,
-            data: {
-                id: 1991,
-                name: 'fat troll'
-            }
         };
     }
 }
