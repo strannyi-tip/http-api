@@ -156,7 +156,7 @@ class Api {
         this._watch_descriptors = {};
 
         /**
-         * Thw watch objects differences.
+         * The watch objects differences.
          *
          * @type {{}}
          * @private
